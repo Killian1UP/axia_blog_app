@@ -1,7 +1,6 @@
 const Post = require("../schema/postSchema")
-const Product = require("../schema/productSchema")
 
-// create a product
+// create a post
 const createPost = async (req, res) => {
     const { title, message, image } = req.body
     const user = req.user
@@ -19,7 +18,7 @@ const createPost = async (req, res) => {
     }
 }
 
-// get all products
+// get all posts
 const getPosts = async (req, res) => {
     try {
         const posts = await Post.find().populate('userId', "-password")
@@ -34,7 +33,7 @@ const getPosts = async (req, res) => {
     }
 }
 
-// get a product by id
+// get a post by id
 const getPostById = async (req, res) => {
     try {
         const { id } = req.params
@@ -50,8 +49,8 @@ const getPostById = async (req, res) => {
     }
 }
 
-// delete a product
-const deleteProduct = async (req, res) => {
+// delete a post
+const deletePost = async (req, res) => {
 
     try {
         const user = req.user
@@ -60,62 +59,62 @@ const deleteProduct = async (req, res) => {
         const post = await Post.findById(id)
         if (!post) {
             return res.status(400).json({
-                message: `Product with the id ${id} is not found`
+                message: `Post with the id ${id} is not found`
             })
         }
-        if (!product.userId.equals(user._id)) {
-            return res.status(400).json({
-                message: "You can only delete your product"
+        if (!post.userId.equals(user._id)) {
+            return res.status(403).json({
+                message: "You can only delete your posts"
             })
         }
-        await product.deleteOne()
+        await post.deleteOne()
         res.status(200).json({
-            message: "Product deleted successfully."
+            message: "Post deleted successfully."
         })
     } catch (error) {
         res.status(500).json({message: error.message})
     }
 }
 
-// update a product
-const updateProduct = async (req, res) => {
+// update a post
+const updatePost = async (req, res) => {
     try {
         const user = req.user
         const { id } = req.params
 
-        const product = await Product.findById(id)
+        const post = await Post.findById(id)
 
-        if (!product) {
+        if (!post) {
             return res.status(404).json({
-                message: `Product with the id ${id} is not found`
+                message: `Post with the id ${id} is not found`
             })
         }
 
-        if (!product.userId.equals(user._id)) {
+        if (!post.userId.equals(user._id)) {
             return res.status(403).json({
-                message: "You can only update your own product"
+                message: "You can only update your own posts"
             })
         }
 
         // Update only allowed fields
         const updates = req.body
 
-        Object.assign(product, updates)
+        Object.assign(post, updates)
 
-        await product.save()
+        await post.save()
 
         res.status(200).json({
             message: "Product updated successfully.",
-            product
+            post
         })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
 }
 module.exports = {
-    getAllProducts,
-    createProduct,
-    getProductById,
-    deleteProduct,
-    updateProduct
+    getPosts,
+    createPost,
+    getPostById,
+    deletePost,
+    updatePost
 }
