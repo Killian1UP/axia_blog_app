@@ -104,7 +104,7 @@ const updatePost = async (req, res) => {
         await post.save()
 
         res.status(200).json({
-            message: "Product updated successfully.",
+            message: "Post updated successfully.",
             post
         })
     } catch (error) {
